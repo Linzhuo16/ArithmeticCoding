@@ -39,9 +39,22 @@ void ArithmeticCoding::readFile(char *filename){
     int i;
     fstream infile;
     infile.open(filename, ios::in);
+    if(!infile.is_open()){
+        //cerr<<"can't find file "<<argv[i+1]<<endl;
+        cerr<<"ERRCODE:"<<errno<<" "<<strerror(errno)<<endl;
+        return;
+    }
+    infile.seekg(0,ios::end);
+    len = infile.tellg();
+    cout << len << endl;
+    infile.seekg(0,ios::beg);
+
     infile >> Content;
     infile.close();
-    len = strlen(Content);
+
+    //len = strlen(Content);
+    //cout << len << endl;
+
     content = new char[len];
     for(i = 0; i < len; i++){
         content[i] = Content[i];
@@ -52,7 +65,7 @@ void ArithmeticCoding::readFile(char *filename){
 void ArithmeticCoding::probilitiesInit(){
     int i, j;
     double a;
-    double probilities[size];
+    double Probilities[size];
     int sum;
     probilities = new double[size];
     for(j = 0; j < len; j++){
@@ -83,8 +96,12 @@ void ArithmeticCoding::encode(char *inputFile, char *outputFile){
     int i, j;
     double down = 0.0;
     double up = 1.0;
+    double down_x, up_x;
     int index;
-    //char *p = *content;
+    char* binaryCharBuf = new char[100];
+    char* p, q = binaryCharBuf;
+    int E3;
+
     char inputchar;
     readFile(inputFile);
     probilitiesInit();
@@ -100,6 +117,77 @@ void ArithmeticCoding::encode(char *inputFile, char *outputFile){
         down = down + (up - down) * probilities[i];
         up = down + (up - down) * probilities[i+1];
 
+        E3 = 0;
+        while(true){
+            if(up==0 && down == 0){
+                if(E3){
+                    up = up_x;
+                    down =down_x;
+                    break;
+                }
+                else{
+                    break;
+                }
+
+            }
+            if(E3 == 0){
+                if(down<0.5&&up<0.5){
+                    *p = 0;
+                    p++;
+                    up = up * 2;
+                    down = down * 2;
+                }
+                else if(down >= 0.5 && up >= 0.5){
+                    *p = 1;
+                    p++;
+                    up = (up - 0.5) * 2;
+                    down = (down - 0.5) * 2;
+                }else{
+                    E3 = 1;
+                    q = p;
+                    p++;
+                    down = down * 2;
+                    up = (up - 0.5) * 2;
+                }
+            }else{
+                if(down<0.5&&up<0.5){
+                    *q = 0;
+                    q++;
+                    while(p != q){
+                        *q = 1;
+                        q++;
+                    }
+
+                    *p = 0;
+                    p++;
+                    up = up * 2;
+                    down = down * 2;
+
+                    E3 = 0;
+                }
+                else if(down >= 0.5 && up >= 0.5){
+                    *q = 1;
+                    q++;
+
+                    while(p != q){
+                        *q = 0;
+                        q++;
+
+                    }
+                    *p = 1;
+                    p++;
+                    up = (up - 0.5) * 2;
+                    down = (down - 0.5) * 2;
+
+                    E3 = 0;
+                }else{
+                    p++;
+                    down = down>0.5?(down - 0.5) *2:down * 2;
+                    up = up>0.5?(up - 0.5) *2:up * 2;
+                }
+            }
+
+        }
     }
 
 }
@@ -145,9 +233,6 @@ void displayDoubleBits(double f)
 
 }
 int main() {
-	double a = 0.25;
-	//cout << *(&a) ;
-	double f = 0.25;
-    displayDoubleBits(f);
+	start();
 
 }
