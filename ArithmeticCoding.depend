@@ -1,6 +1,0 @@
-# depslib dependency file v1.0
-1552476648 source:e:\林卓\2018-2019\大三下\data_compression\arithmentcoding\arithmeticcoding\arithmeticcoding.cpp
-	<iostream>
-	<fstream>
-	<string.h>
-
